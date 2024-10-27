@@ -1,0 +1,4 @@
+Local alignment:
+TAT
+TAT
+Score: 15.0
