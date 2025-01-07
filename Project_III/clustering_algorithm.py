@@ -19,13 +19,9 @@ import pandas as pd
 from adjustText import adjust_text
 from matplotlib.colors import ListedColormap, to_hex, to_rgb
 
-# Path to the MUSCLE executable
-MUSCLE_PATH = 'muscle'  # Ensure MUSCLE is in your PATH or provide the full path
 
 def assign_colors(categories):
-    """
-    Assigns unique colors to each category for visualization purposes.
-    """
+
     unique_categories = sorted(set(categories))
     num_categories = len(unique_categories)
     cmap = plt.cm.get_cmap('tab20', num_categories)
@@ -33,9 +29,7 @@ def assign_colors(categories):
     return color_dict
 
 def parse_fasta_from_directory(directory):
-    """
-    Parses all FASTA files in the specified directory and extracts sequences along with metadata.
-    """
+
     sequences = []
     txt_files = glob.glob(os.path.join(directory, "*.txt"))
     if not txt_files:
@@ -45,10 +39,9 @@ def parse_fasta_from_directory(directory):
         with open(file, 'r') as handle:
             for record in SeqIO.parse(handle, "fasta"):
                 description = record.description
-                # Extract Animal from description, assuming format [Animal]
                 animal_match = re.search(r'\[(.*?)\]', description)
                 animal = animal_match.group(1) if animal_match else "Unknown"
-                # Extract Protein group from description, assuming it follows the first word
+            
                 protein_match = re.search(r'^\S+\s+(.+?)\s+\[', description)
                 protein = protein_match.group(1) if protein_match else "Unknown"
                 sequences.append({
@@ -61,9 +54,6 @@ def parse_fasta_from_directory(directory):
     return sequences
 
 def compute_similarity_matrix(sequences):
-    """
-    Computes a pairwise similarity matrix based on global pairwise alignment.
-    """
     ids = [seq['Sequence_ID'] for seq in sequences]
     n = len(ids)
     similarity_matrix = np.zeros((n, n))
@@ -87,25 +77,17 @@ def compute_similarity_matrix(sequences):
     return similarity_matrix, ids
 
 def create_distance_matrix(similarity_matrix):
-    """
-    Converts similarity scores to distances.
-    """
+
     distance_matrix = 100 - similarity_matrix
     return distance_matrix
 
 def hierarchical_clustering(distance_matrix, method='average'):
-    """
-    Performs hierarchical clustering using the specified linkage method.
-    """
+
     condensed_dist = squareform(distance_matrix)
     linkage_matrix = linkage(condensed_dist, method=method)
     return linkage_matrix
 
 def perform_msa(sequences_subset, output_format='fasta'):
-    """
-    Performs Multiple Sequence Alignment (MSA) using MUSCLE.
-    Returns the alignment file path if successful, else None.
-    """
     with tempfile.NamedTemporaryFile(mode='w+', delete=False, encoding='utf-8', suffix='.fasta') as temp_input:
         SeqIO.write(sequences_subset, temp_input, "fasta")
         temp_input_name = temp_input.name
@@ -126,10 +108,7 @@ def perform_msa(sequences_subset, output_format='fasta'):
         return None
 
 def build_upgma_tree(alignment_file):
-    """
-    Builds a UPGMA tree from the given alignment file.
-    Returns the tree object if successful, else None.
-    """
+
     try:
         alignment = SeqIO.read(alignment_file, "fasta")
     except Exception as e:
@@ -152,18 +131,14 @@ def build_upgma_tree(alignment_file):
         return None
 
 def visualize_tree(tree, color_map, title, filename):
-    """
-    Visualizes and saves the phylogenetic tree with colored branches.
-    """
     if tree is None:
         print(f"No tree to visualize for '{title}'.")
         return
 
-    # Assign colors to terminal nodes based on the color_map
     for clade in tree.get_terminals():
-        clade.color = color_map.get(clade.name, "#000000")  # Default to black if not found
+        clade.color = color_map.get(clade.name, "#000000")
 
-    # Draw the tree
+
     plt.figure(figsize=(20, 10))
     Phylo.draw(
         tree,
@@ -173,14 +148,10 @@ def visualize_tree(tree, color_map, title, filename):
         label_colors=None
     )
 
-    # Assign colors to terminal labels
     ax = plt.gca()
     for terminal in tree.get_terminals():
         label = terminal.name
-        color = color_map.get(label.split(' - ')[0], "#000000")  # Assuming color based on the first part (Animal or Protein)
-        # The following code attempts to color the text labels; however, Biopython's Phylo.draw does not provide direct access to label artists
-        # As a workaround, you can customize the drawing function or use other libraries like ete3 for more control
-        # For simplicity, we'll skip manual coloring here
+        color = color_map.get(label.split(' - ')[0], "#000000") 
 
     plt.title(title)
     plt.tight_layout()
@@ -212,14 +183,14 @@ def plot_dendrogram(linkage_matrix, labels, metadata, cluster_num, title='Hierar
             blended_color = (animal_color + protein_color) / 2
             lbl.set_color(to_hex(blended_color))
         except ValueError:
-            # In case the label doesn't have both animal and protein
+            
             lbl.set_color('#000000')
     plt.title(title)
     plt.xlabel('Sequence ID')
     plt.ylabel('Distance (100 - Similarity)')
     plt.tight_layout()
     
-    # Determine filename
+    
     if filename is None:
         dendro_filename = f'dendrogram_{cluster_num}_clusters.png'
     else:
@@ -289,7 +260,7 @@ def plot_tsne(similarity_matrix, labels, metadata, clusters, title='t-SNE Visual
         legend='full',
         alpha=0.7
     )
-    # Annotate points
+    
     texts = []
     for i in range(df_tsne.shape[0]):
         texts.append(
@@ -308,7 +279,7 @@ def plot_tsne(similarity_matrix, labels, metadata, clusters, title='t-SNE Visual
     plt.ylabel('t-SNE 2')
     plt.legend(title='Cluster', bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout()
-    # Extract cluster number from title
+   
     try:
         cluster_num = re.search(r'(\d+) Clusters', title).group(1)
     except:
@@ -367,7 +338,7 @@ def main():
     """
     Main function to orchestrate the phylogenetic analysis.
     """
-    directory = 'Data_FASTA/'  # Directory containing FASTA files
+    directory = 'Data_FASTA/'  
     silhouette_range_min = 2
     silhouette_range_max = 10
     cluster_numbers = range(silhouette_range_min, silhouette_range_max + 1)
@@ -397,7 +368,7 @@ def main():
     cluster_labels = assign_clusters(linkage_matrix, optimal_clusters)
     save_cluster_assignments(sequences, cluster_labels, filename=f'cluster_assignments_{optimal_clusters}_clusters.csv')
     
-    # Prepare labels for dendrogram and other plots
+    
     labels = [f"{seq['Animal']} - {seq['Protein']}" for seq in sequences]
     
     print("\nPlotting full dendrogram...")
@@ -427,10 +398,10 @@ def main():
         title=f'Cluster Heatmap ({optimal_clusters} Clusters)'
     )
     
-    # Building separate dendrograms
+    
     print("\nBuilding phylogenetic trees...")
     
-    # i. Separate dendrograms for each organism
+    
     print("\nBuilding dendrograms for each organism...")
     organisms = sorted(set(seq['Animal'] for seq in sequences))
     for organism in organisms:
@@ -444,7 +415,7 @@ def main():
         subset_similarity = similarity_matrix[np.ix_(subset_indices, subset_indices)]
         subset_distance = create_distance_matrix(subset_similarity)
         subset_linkage = hierarchical_clustering(subset_distance, method='average')
-        # Plot dendrogram for this organism
+        
         dendro_filename = f'dendrogram_{optimal_clusters}_clusters_organism_{organism}.png'
         plot_dendrogram(
             subset_linkage,
@@ -455,7 +426,7 @@ def main():
             filename=dendro_filename
         )
     
-    # ii. Separate dendrograms for each protein group
+    
     print("\nBuilding dendrograms for each protein group...")
     proteins = sorted(set(seq['Protein'] for seq in sequences))
     for protein in proteins:
@@ -469,7 +440,7 @@ def main():
         subset_similarity = similarity_matrix[np.ix_(subset_indices, subset_indices)]
         subset_distance = create_distance_matrix(subset_similarity)
         subset_linkage = hierarchical_clustering(subset_distance, method='average')
-        # Plot dendrogram for this protein group
+        
         dendro_filename = f'dendrogram_{optimal_clusters}_clusters_protein_{protein}.png'
         plot_dendrogram(
             subset_linkage,
@@ -480,7 +451,7 @@ def main():
             filename=dendro_filename
         )
     
-    # iii. Separate dendrograms for each cluster
+    
     print("\nBuilding dendrograms for each cluster...")
     unique_clusters = sorted(set(cluster_labels))
     for unique_cluster in unique_clusters:
@@ -494,7 +465,7 @@ def main():
         subset_similarity = similarity_matrix[np.ix_(subset_indices, subset_indices)]
         subset_distance = create_distance_matrix(subset_similarity)
         subset_linkage = hierarchical_clustering(subset_distance, method='average')
-        # Plot dendrogram for this cluster
+   
         dendro_filename = f'dendrogram_{optimal_clusters}_clusters_specific_cluster_{unique_cluster}.png'
         plot_dendrogram(
             subset_linkage,
@@ -504,20 +475,6 @@ def main():
             title=f'Hierarchical Clustering Dendrogram for Cluster {unique_cluster} ({optimal_clusters} Clusters)',
             filename=dendro_filename
         )
-    
-    # iv. One common dendrogram for all sequences (already plotted above as full dendrogram)
-    # If you want to plot it again specifically, you can uncomment the following lines:
-    """
-    print("\nRe-building common dendrogram for all sequences...")
-    plot_dendrogram(
-        linkage_matrix,
-        labels,
-        sequences,
-        cluster_num=optimal_clusters,
-        title=f'Common Hierarchical Clustering Dendrogram ({optimal_clusters} Clusters)',
-        filename=f'dendrogram_{optimal_clusters}_clusters_all_sequences.png'
-    )
-    """
     
     print("\nPhylogenetic analysis completed successfully.")
 
