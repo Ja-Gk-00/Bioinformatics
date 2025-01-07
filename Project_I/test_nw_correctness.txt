@@ -1,0 +1,5 @@
+Global alignment no. 1:
+ATCG
+AT-G
+Score: 13.0
+

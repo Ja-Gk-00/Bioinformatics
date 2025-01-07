@@ -1,0 +1,4 @@
+Local alignment:
+ATCG
+AT-G
+Score: 13.0

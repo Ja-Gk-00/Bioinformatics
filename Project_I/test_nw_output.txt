@@ -1,0 +1,5 @@
+Global alignment no. 1:
+G-ATTACA
+GCATG-CT
+Score: 14.0
+

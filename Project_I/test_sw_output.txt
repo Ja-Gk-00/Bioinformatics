@@ -1,0 +1,4 @@
+Local alignment:
+G-ATTAC
+GCATG-C
+Score: 15.0

@@ -1,0 +1,11 @@
+/env
+env/
+venv/
+/venv
+/Data
+Data/
+
+
+# unnecessary files
+phylogeny_algorithm.py
+*.csv

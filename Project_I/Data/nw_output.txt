@@ -1,40 +1,35 @@
 Global alignment no. 1:
-AAAA----AAAA
-AAAACCCC----
-Score: 4.0
+G-AAAGT-
+GGAA-GTT
+Score: 19.0
 
 Global alignment no. 2:
-AAAA---A-AAA
-AAAACCC-C---
-Score: 4.0
+-GAAAGT-
+GGAA-GTT
+Score: 19.0
 
 Global alignment no. 3:
-AAAA--A--AAA
-AAAACC-CC---
-Score: 4.0
+G-AAAGT-
+GGA-AGTT
+Score: 19.0
 
 Global alignment no. 4:
-AAAA-A---AAA
-AAAAC-CCC---
-Score: 4.0
+-GAAAGT-
+GGA-AGTT
+Score: 19.0
 
 Global alignment no. 5:
-AAAAA----AAA
-AAAA-CCCC---
-Score: 4.0
+G-AAAGT-
+GG-AAGTT
+Score: 19.0
 
 Global alignment no. 6:
-AAAAA----AAA
-AAA-ACCCC---
-Score: 4.0
+-GAAAGT-
+GG-AAGTT
+Score: 19.0
 
 Global alignment no. 7:
-AAAAA----AAA
-AA-AACCCC---
-Score: 4.0
-
-Global alignment no. 8:
-AAAAA----AAA
-A-AAACCCC---
-Score: 4.0
+GA-AAGT-
+G-GAAGTT
+Score: 19.0
 
